@@ -24,11 +24,12 @@ const storage = multer.diskStorage({
 // Configure File Filter for Images, PDFs, and Videos
 const fileFilter = (req, file, cb) => {
   // Allowed ext
-  const filetypes = /jpeg|jpg|png|gif|webp|pdf|mp4|mkv|avi|mov/;
-  // Check ext
-  const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+  const extRegex = /jpeg|jpg|png|gif|webp|pdf|mp4|mkv|avi|mov/;
+  const extname = extRegex.test(path.extname(file.originalname).toLowerCase());
+  
   // Check mime
-  const mimetype = filetypes.test(file.mimetype);
+  const mimeRegex = /image\/.*|video\/.*|application\/pdf/;
+  const mimetype = mimeRegex.test(file.mimetype);
 
   if (mimetype && extname) {
     return cb(null, true);
@@ -37,7 +38,6 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-// Initialize upload middleware
 const upload = multer({
   storage: storage,
   fileFilter: fileFilter,
@@ -46,4 +46,23 @@ const upload = multer({
   }
 });
 
-export default upload;
+// Wrapper middleware to explicitly catch and send errors
+export const uploadMiddleware = (req, res, next) => {
+  upload.single('file')(req, res, (err) => {
+    if (err instanceof multer.MulterError) {
+      // A Multer error occurred when uploading (e.g., size limit)
+      if (err.code === 'LIMIT_FILE_SIZE') {
+        return res.status(400).json({ message: 'File size is too large. Maximum allowed size is 50MB.' });
+      }
+      return res.status(400).json({ message: err.message });
+    } else if (err) {
+      // An unknown error occurred or our custom fileFilter error
+      if (err.message.includes('Only Images, PDFs, and Video files are allowed')) {
+        return res.status(400).json({ message: err.message.replace('Error: ', '') });
+      }
+      return res.status(400).json({ message: err.message });
+    }
+    // Everything went fine
+    next();
+  });
+};

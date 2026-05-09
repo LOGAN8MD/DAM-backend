@@ -1,12 +1,12 @@
 import express from 'express';
-import upload from '../middleware/upload.js';
+import { uploadMiddleware } from '../middleware/upload.js';
 import { uploadAsset, getAssets, downloadAsset, searchAssets } from '../controllers/assetController.js';
 
 const router = express.Router();
 
 // @route   POST /api/assets/upload
 // @desc    Upload a single file
-router.post('/upload', upload.single('file'), uploadAsset);
+router.post('/upload', uploadMiddleware, uploadAsset);
 
 // @route   GET /api/assets/search
 // @desc    Search assets by multiple parameters
