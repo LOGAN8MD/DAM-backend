@@ -153,3 +153,30 @@ export const searchAssets = async (req, res, next) => {
     next(error);
   }
 };
+
+// @desc    Delete an asset by ID
+// @route   DELETE /api/assets/:id
+// @access  Public
+export const deleteAsset = async (req, res, next) => {
+  try {
+    const assetId = req.params.id;
+    const asset = await Asset.findById(assetId);
+
+    if (!asset) {
+      return res.status(404).json({ message: 'Asset not found' });
+    }
+
+    // Delete file from filesystem
+    const filePath = path.resolve('uploads', asset.filename);
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+
+    // Delete from database
+    await Asset.findByIdAndDelete(assetId);
+
+    res.status(200).json({ message: 'Asset deleted successfully' });
+  } catch (error) {
+    next(error);
+  }
+};

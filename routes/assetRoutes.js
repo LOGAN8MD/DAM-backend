@@ -1,6 +1,6 @@
 import express from 'express';
 import { uploadMiddleware } from '../middleware/upload.js';
-import { uploadAsset, getAssets, downloadAsset, searchAssets, getAssetMetadata } from '../controllers/assetController.js';
+import { uploadAsset, getAssets, downloadAsset, searchAssets, getAssetMetadata, deleteAsset } from '../controllers/assetController.js';
 
 const router = express.Router();
 
@@ -21,6 +21,10 @@ router.get('/metadata', getAssetMetadata);
 // @route   GET /api/assets/download/:filename
 // @desc    Download an asset
 router.get('/download/:filename', downloadAsset);
+
+// @route   DELETE /api/assets/:id
+// @desc    Delete an asset
+router.delete('/:id', deleteAsset);
 
 // @route   GET /api/assets
 // @desc    Get all assets with optional filters
