@@ -1,6 +1,6 @@
 import express from 'express';
 import { uploadMiddleware } from '../middleware/upload.js';
-import { uploadAsset, getAssets, downloadAsset, searchAssets, getAssetMetadata, deleteAsset } from '../controllers/assetController.js';
+import { uploadAsset, getAssets, downloadAsset, searchAssets, deleteAsset } from '../controllers/assetController.js';
 
 const router = express.Router();
 
@@ -14,7 +14,7 @@ router.get('/search', searchAssets);
 
 // @route   GET /api/assets/metadata
 // @desc    Get unique tags and names for autocomplete
-router.get('/metadata', getAssetMetadata);
+// router.get('/metadata', getAssetMetadata);
 
 
 
